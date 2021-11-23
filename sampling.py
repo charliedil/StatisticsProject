@@ -79,5 +79,6 @@ def block_srs(students, num_subgroups, subgroup_size, category):
             students_of_status_sample = srs(stud_to_status[status], subgroup_size)
             for s in students_of_status_sample:
                 entity_sample.append(s)
+    return entity_sample
 
 

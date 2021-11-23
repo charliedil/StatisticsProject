@@ -1,17 +1,27 @@
 import tabula
 import argparse
 import student
+import sampling
 
 
 def parse_csv(csv_path):
     file = open(csv_path, "r")
     text = file.read()
+    file.close()
     lines = text.split("\n")
     students = []
     for line in lines[1:len(lines)-1]:
         attr = line.split(",")
         students.append(student.Student(attr[0], attr[1], attr[2], attr[3], attr[4]))
     return students
+
+
+def write_out_samples(samples, output):
+    file = open(output, "w")
+    file.write("ID Number, Sex, Teacher, Status, SOL score\n")
+    for sample in samples:
+        file.write(sample.id+","+sample.sex+","+sample.teacher+","+sample.status+","+sample.score+"\n")
+    file.close()
 
 
 if __name__ == '__main__':
@@ -58,15 +68,22 @@ if __name__ == '__main__':
     if not srs and block not in categories:
         print("If block srs, then the category should be either sex, teacher, or status")
         exit(-1)
-    if not srs and
-
+    if not srs and (num_subgroups<=0 or subgroup_size<=0):
+        print("If block srs, then specify num_subgroups and subgroup_size with a positive integer.")
+        exit(-1)
+    if srs and sample_size <=0:
+        print("if srs, then specify sample_size with a positive integer.")
+        exit(-1)
     # actual algorithm
     if scraper:
         tabula.convert_into(pdf_path, output_path + "studentData.csv", pages='all')
         csv_path = output_path + "studentData.csv"
     students = parse_csv(csv_path)
-
+    samples = []
     if srs:
-        students
+        samples = sampling.srs(students, sample_size)
+    else:
+        samples = sampling.block_srs(students, num_subgroups, subgroup_size, block)
+    write_out_samples(samples, output_path + "sample.csv")
 
 
