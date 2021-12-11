@@ -7,7 +7,7 @@ def srs(entities, sample_size):
     entity_sample = []
     chosen_numbers = []
     for i in range(sample_size):
-        index = randrange(sample_size)
+        index = randrange(len(entities))
         while index in chosen_numbers:
             index = randrange(sample_size)
         entity_sample.append(entities[index])
