@@ -33,6 +33,8 @@ if __name__ == '__main__':
     parser.add_argument("--block", type=str, help="If you want to do block SRS, what category do you wish for the "
                                                   "blocks to be (Options: Sex, teacher, or status). Default will be"
                                                   "regular SRS.")
+    parser.add_argument("--population_type", type=str, help="What do you want the population to be? Default uses all students")
+    parser.add_argument("--population_filter", type=str, help="What class of the population type are you looking for? Not used unless pop type is specified")
     parser.add_argument("--sample_size", type=int, help="Required for regular SRS. Size of the desired samples.", default=-1)
     parser.add_argument("--num_subgroups", type=int, help="Required for block SRS. Number of blocks desired.", default=-1)
     parser.add_argument("--subgroup_size", type=int, help="Required for block SRS. Size of subgroup samples.",default=-1)
@@ -45,6 +47,8 @@ if __name__ == '__main__':
     sample_size = args.sample_size
     num_subgroups = args.num_subgroups
     subgroup_size = args.subgroup_size
+    population_type = args.population_type
+    population_filter = args.population_filter #not worried about error handling right now, need to get this done soon
     categories = ["sex", "teacher", "status"]
 
     # check for whether we will be doing regular srs or block srs.
@@ -79,6 +83,26 @@ if __name__ == '__main__':
         tabula.convert_into(pdf_path, output_path + "studentData.csv", pages='all')
         csv_path = output_path + "studentData.csv"
     students = parse_csv(csv_path)
+    student_temp = []
+    if population_type == "Sex":
+        for student in students:
+            if student.sex==population_filter:
+                student_temp.append(student)
+        students= student_temp
+    if population_type == "Status":
+        for student in students:
+            if student.status==population_filter:
+                student_temp.append(student)
+        students=student_temp
+    if population_type == "Score":
+        for student in students:
+            if population_filter=="Fail" and int(student.score) <= 399:
+                student_temp.append(student)
+            elif population_filter=="Pass" and int(student.score) <= 499:
+                student_temp.append(student)
+            elif population_filter=="Advanced" and int(student.score)>=500:
+                student_temp.append(student)
+        students = student_temp
     samples = []
     if srs:
         samples = sampling.srs(students, sample_size)
